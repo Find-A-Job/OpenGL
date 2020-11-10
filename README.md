@@ -6,73 +6,77 @@
 ### 着色器
 编写着色器源码，编译着色器，创建空的着色器对象，与刚编译好的着色器进行绑定<br>
 可以创建多个着色器对象，在绘制前调用gl.useprogram(prog)即可启用
-```
-func getFShader2() string {
-	fs := `
-	   #version 410
-	   out vec4 frag_colour;
-	   void main() {
-	       frag_colour = vec4(0.5, 1, 1, 1);
-	   }
-	` + "\x00"
-	return fs
-}
-func compileShader(source string, shaderType uint32) (uint32, error) {
-	shader := gl.CreateShader(shaderType)
 
-	csources, free := gl.Strs(source)
-	gl.ShaderSource(shader, 1, csources, nil)
-	free()
-	gl.CompileShader(shader)
-
-	var status int32
-	gl.GetShaderiv(shader, gl.COMPILE_STATUS, &status)
-	if status == gl.FALSE {
-		var logLength int32
-		gl.GetShaderiv(shader, gl.INFO_LOG_LENGTH, &logLength)
-
-		log := strings.Repeat("\x00", int(logLength+1))
-		gl.GetShaderInfoLog(shader, logLength, nil, gl.Str(log))
-
-		return 0, fmt.Errorf("failed to compile %v: %v", source, log)
-	}
-
-	return shader, nil
-}
-...
-	vs := getVShader()
-	fs := getFShader()
-	fs2 := getFShader2()
-	if err := gl.Init(); err != nil {
-		panic(err)
-	}
-	vertexShader, err := compileShader(vs, gl.VERTEX_SHADER)
-	if err != nil {
-		panic(err)
-	}
-	fragmentShader, err := compileShader(fs, gl.FRAGMENT_SHADER)
-	if err != nil {
-		panic(err)
-	}
-
-	prog := gl.CreateProgram()
-	gl.AttachShader(prog, vertexShader)
-	gl.AttachShader(prog, fragmentShader)
-	gl.LinkProgram(prog)
-
-	prog2 := gl.CreateProgram()
-	gl.AttachShader(prog2, vertexShader)
-	gl.AttachShader(prog2, fragmentShader2)
-	gl.LinkProgram(prog2)
+<details>
+  <summary>代码</summary>    
 	
-...
-		gl.UseProgram(prog2)
-		gl.BindVertexArray(VAO2)
-		gl.DrawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, nil)
-		gl.BindVertexArray(0)
+	func getFShader2() string {
+		fs := `
+		   #version 410
+		   out vec4 frag_colour;
+		   void main() {
+		       frag_colour = vec4(0.5, 1, 1, 1);
+		   }
+		` + "\x00"
+		return fs
+	}
+	func compileShader(source string, shaderType uint32) (uint32, error) {
+		shader := gl.CreateShader(shaderType)
+	
+		csources, free := gl.Strs(source)
+		gl.ShaderSource(shader, 1, csources, nil)
+		free()
+		gl.CompileShader(shader)
+	
+		var status int32
+		gl.GetShaderiv(shader, gl.COMPILE_STATUS, &status)
+		if status == gl.FALSE {
+			var logLength int32
+			gl.GetShaderiv(shader, gl.INFO_LOG_LENGTH, &logLength)
+	
+			log := strings.Repeat("\x00", int(logLength+1))
+			gl.GetShaderInfoLog(shader, logLength, nil, gl.Str(log))
+	
+			return 0, fmt.Errorf("failed to compile %v: %v", source, log)
+		}
+	
+		return shader, nil
+	}
+	...
+		vs := getVShader()
+		fs := getFShader()
+		fs2 := getFShader2()
+		if err := gl.Init(); err != nil {
+			panic(err)
+		}
+		vertexShader, err := compileShader(vs, gl.VERTEX_SHADER)
+		if err != nil {
+			panic(err)
+		}
+		fragmentShader, err := compileShader(fs, gl.FRAGMENT_SHADER)
+		if err != nil {
+			panic(err)
+		}
+	
+		prog := gl.CreateProgram()
+		gl.AttachShader(prog, vertexShader)
+		gl.AttachShader(prog, fragmentShader)
+		gl.LinkProgram(prog)
+	
+		prog2 := gl.CreateProgram()
+		gl.AttachShader(prog2, vertexShader)
+		gl.AttachShader(prog2, fragmentShader2)
+		gl.LinkProgram(prog2)
 		
-...
-```
+	...
+			gl.UseProgram(prog2)
+			gl.BindVertexArray(VAO2)
+			gl.DrawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, nil)
+			gl.BindVertexArray(0)
+			
+	...
+
+</details>
 
 ### 纹理环绕
 纹理坐标的范围通常是从(0, 0)到(1, 1)<br>
