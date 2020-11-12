@@ -3,6 +3,7 @@
 ------
 [参考资料](https://learnopengl-cn.readthedocs.io/zh/latest/01%20Getting%20started/06%20Textures/#_1)
 ------
+生成vao前需要先编译并link着色器，否则调用GenVertexArrays时会崩溃
 ### 着色器
 编写着色器源码，编译着色器，创建空的着色器对象，与刚编译好的着色器进行绑定<br>
 可以创建多个着色器对象，在绘制前调用gl.useprogram(prog)即可启用
